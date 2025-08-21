@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elegant Brows & Lashes | Professional Eyebrow & Eyelash Services</title>
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'dark-red': '#660000',
+            'light-red': '#990000',
+            'accent-red': '#800000',
+          },
+          fontFamily: {
+            'cursive': ['"Great Vibes"', 'cursive'],
+            'body': ['"Cormorant Garamond"', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Flatpickr for Date/Time Selection -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+  
+  <style id="app-style">
+    body {
+      background-color: #1a0000;
+      color: #f8e8e8;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    
+    .cursive {
+      font-family: 'Great Vibes', cursive;
+    }
+    
+    .btn-primary {
+      background-color: #660000;
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background-color: #990000;
+    }
+    
+    .form-input {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #f8e8e8;
+    }
+    
+    .form-input:focus {
+      border-color: #990000;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(153, 0, 0, 0.25);
+    }
+    
+    .payment-method {
+      transition: all 0.3s ease;
+    }
+    
+    .payment-method:hover {
+      transform: translateY(-5px);
+    }
+    
+    .flatpickr-calendar {
+      background: #2a0000;
+      border: none;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    }
+    
+    .flatpickr-day {
+      color: #f8e8e8;
+    }
+    
+    .flatpickr-day.selected {
+      background: #660000;
+      border-color: #660000;
+    }
+    
+    .flatpickr-day:hover {
+      background: #990000;
+    }
+    
+    .flatpickr-months .flatpickr-month {
+      background: #1a0000;
+      color: #f8e8e8;
+    }
+    
+    .flatpickr-current-month .flatpickr-monthDropdown-months {
+      background: #1a0000;
+      color: #f8e8e8;
+    }
+    
+    .flatpickr-time {
+      background: #1a0000;
+    }
+    
+    .flatpickr-time input {
+      color: #f8e8e8;
+    }
+    
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(26, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+    
+    .loading-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    
+    .scroll-down-indicator {
+      animation: bounce 2s infinite;
+    }
+    
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-15px);
+      }
+      60% {
+        transform: translateY(-7px);
+      }
+    }
+    
+    /* Custom SweetAlert2 styling */
+    .swal2-popup {
+      background: #2a0000 !important;
+      color: #f8e8e8 !important;
+    }
+    
+    .swal2-title, .swal2-content {
+      color: #f8e8e8 !important;
+    }
+    
+    .swal2-confirm {
+      background: #660000 !important;
+    }
+    
+    .swal2-confirm:hover {
+      background: #990000 !important;
+    }
+  </style>
+</head>
+<body>
+  <!-- Loading overlay -->
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="text-center">
+      <div class="spinner-border inline-block h-12 w-12 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" role="status">
+        <span class="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">Loading...</span>
+      </div>
+      <p class="mt-4 text-xl">Processing your booking...</p>
+    </div>
+  </div>
+
+  <!-- Header/Hero Section -->
+  <header class="min-h-screen flex flex-col justify-center items-center px-6 bg-gradient-to-b from-[#1a0000] to-[#2a0000]">
+    <div class="text-center max-w-lg mx-auto">
+      <h1 class="cursive text-5xl md:text-7xl mb-2 text-white">Elegant Brows <span class="text-light-red">&</span> Lashes</h1>
+      <p class="text-xl md:text-2xl mb-8 italic opacity-90">Enhance your natural beauty</p>
+      <div class="w-24 h-1 bg-light-red mx-auto mb-8"></div>
+      <p class="mb-10 text-lg">Premium eyebrow and eyelash services tailored to enhance your natural beauty. By appointment only.</p>
+      <a href="#booking" class="btn-primary text-white py-3 px-8 rounded-full text-xl font-semibold inline-block hover:shadow-lg transition duration-300">Book Now</a>
+      
+      <div class="mt-16 text-center scroll-down-indicator">
+        <p class="text-sm opacity-70 mb-2">Scroll to learn more</p>
+        <i class="fa fa-chevron-down opacity-70"></i>
+      </div>
+    </div>
+  </header>
+
+  <!-- Services Section -->
+  <section class="py-16 px-6 bg-[#2a0000]">
+    <div class="max-w-4xl mx-auto">
+      <h2 class="cursive text-4xl md:text-5xl mb-12 text-center text-white">Our Services</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Eyebrow Services -->
+        <div class="bg-[#330000] p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+          <h3 class="text-2xl mb-4 font-semibold">Eyebrow Services</h3>
+          <ul class="space-y-4">
+            <li class="flex justify-between">
+              <span>Eyebrow Shaping</span>
+              <span class="text-light-red">$35</span>
+            </li>
+            <li class="flex justify-between">
+              <span>Eyebrow Tinting</span>
+              <span class="text-light-red">$25</span>
+            </li>
+            <li class="flex justify-between">
+              <span>Eyebrow Lamination</span>
+              <span class="text-light-red">$75</span>
+            </li>
+            <li class="flex justify-between">
+              <span>Combo (Shape + Tint)</span>
+              <span class="text-light-red">$50</span>
+            </li>
+          </ul>
+        </div>
+        
+        <!-- Eyelash Services -->
+        <div class="bg-[#330000] p-6 rounded-lg shadow-lg hover:shadow-xl transition duration-300">
+          <h3 class="text-2xl mb-4 font-semibold">Eyelash Services</h3>
+          <ul class="space-y-4">
+            <li class="flex justify-between">
+              <span>Classic Extensions</span>
+              <span class="text-light-red">$95</span>
+            </li>
+            <li class="flex justify-between">
+              <span>Volume Extensions</span>
+              <span class="text-light-red">$125</span>
+            </li>
+            <li class="flex justify-between">
+              <span>Hybrid Extensions</span>
+              <span class="text-light-red">$140</span>
+            </li>
+            <li class="flex justify-between">
+              <span>Lash Lift + Tint</span>
+              <span class="text-light-red">$85</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="mt-10 text-center">
+        <p class="italic text-lg">* A $25 deposit is required to secure your appointment *</p>
+        <a href="#booking" class="btn-primary text-white py-2 px-6 rounded-full mt-4 inline-block hover:shadow-lg transition duration-300">Book Your Appointment</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking Form Section -->
+  <section id="booking" class="py-16 px-6 bg-[#1a0000]">
+
+
+
+
+
+      <div class="max-w-3xl mx-auto">
+        <div id="contact-form-container">
+          <form id="contact-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+                <div>
+                <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                <input 
+                  type="text" 
+                  id="fullName" 
+                  name="fullName" 
+                  class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"
+                  placeholder="Your name"
+                >
+                <div class="error-message hidden" id="name-error"></div>
+              </div>
+              
+              <div>
+                <label for="phoneNumber" class="block text-sm font-medium text-gray-300 mb-2">Phone Number</label>
+                <input 
+                  type="tel" 
+                  id="phoneNumber" 
+                  name="phoneNumber" 
+                  class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"
+                  placeholder="602-123-4567"
+                >
+                <div class="error-message hidden" id="phone-error"></div>
+              </div>
+
+
+
+            </div>
+
+
+            <div>
+                <label for="serviceType" class="block text-sm font-medium text-gray-300 mb-2">Service Type</label>
+                <select id="serviceType" name="serviceType" class="form-input w-full px-4 py-3 rounded-lg focus:outline-none">
+                  <option class="text-black" value="eyebrow">Eyebrow</option>
+                  <option class="text-black" value="eyelash">Eyelash</option>                  
+                  <option class="text-black" value="both">LASH & BASH</option>                  
+                </select>
+                <div class="error-message hidden" id="service-error"></div>
+              </div>
+
+            <div>
+
+                <label for="appointmentDate" class="block text-sm font-medium text-gray-300 mb-2">Appointment Date</label>
+                <input type="date" id="appointmentDate" name="appointmentDate" class="form-input w-full px-4 py-3 rounded-lg focus:outline-none ">
+                <div class="error-message hidden" id="date-error"></div>
+              </div>
+
+            <div>
+
+                <label for="appointmentTime" class="block text-sm font-medium text-gray-300 mb-2">Appointment Time</label>
+                <input type="time" id="appointmentTime" name="appointmentTime" class="form-input w-full px-4 py-3 rounded-lg focus:outline-none">
+                <div class="error-message hidden" id="time-error"></div>
+              </div>
+
+            <div>
+                <label for="specialRequests" class="block text-sm font-medium text-gray-300 mb-2">Special Requests</label>
+                <textarea id="specialRequests" name="specialRequests" rows="4" class="form-input w-full px-4 py-3 rounded-lg focus:outline-none"></textarea>
+                <div class="error-message hidden" id="special-error"></div>
+              </div>
+
+            <div>
+
+                <label for="paymentMethod" class="block text-sm font-medium text-gray-300 mb-2">Payment Method</label>
+                <select id="paymentMethod" name="paymentMethod" class="form-input w-full px-4 py-3 rounded-lg focus:outline-none">
+                  <option class="text-black" value="cashapp">CashApp</option>
+                  <option class="text-black" value="zelle">Zelle</option>
+                  <option class="text-black" value="paypal">PayPal</option>
+                </select>
+                <div class="error-message hidden" id="payment-error"></div>
+              </div>
+
+            <div>
+              <label for="depositConfirmation" class="flex items-center space-x-2">
+                <input 
+                  type="checkbox" 
+                  id="depositConfirmation" 
+                  name="depositConfirmation" 
+                  class="form-checkbox h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                >
+                <span class="text-sm text-gray-300">I will send a $25 deposit to secure my appointment</span>
+
+              </label>
+            </div>
+
+
+
+            <div class="text-center">
+              <button 
+                type="submit" 
+                class="btn-primary px-8 py-3 rounded-lg text-white font-medium w-full md:w-auto"
+              >
+                Send Message
+              </button>
+            </div>
+
+          </form>
+        </div>
+        
+        <!-- Success Message (Hidden by default) -->
+        <div id="success-message" class="success-message rounded-lg p-8 text-center hidden">
+          <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
+          <h3 class="text-2xl font-bold mb-2">Message Sent!</h3>
+          <p class="text-gray-300 mb-6">Thank you for reaching out. I'll get back to you as soon as possible.</p>
+          <button id="send-another" class="text-indigo-400 hover:text-indigo-300">Send another message</button>
+        </div>
+        
+        <!-- Loading Indicator (Hidden by default) -->
+        <div id="loading-indicator" class="text-center py-12 hidden">
+          <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500"></div>
+          <p class="mt-4 text-gray-300">Sending your message...</p>
+        </div>
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  </section>
+
+  <!-- Confirmation screen (initially hidden) -->
+  <section id="confirmationSection" class="py-16 px-6 bg-[#1a0000] hidden">
+    <div class="max-w-lg mx-auto text-center">
+      <div class="mb-6">
+        <i class="fas fa-check-circle text-light-red text-5xl"></i>
+      </div>
+      <h2 class="cursive text-4xl md:text-5xl mb-4 text-white">Booking Confirmed</h2>
+      <p class="mb-6">Thank you for your booking request. Here's a summary of your appointment:</p>
+      
+      <div class="bg-[#330000] p-6 rounded-lg mb-8 text-left">
+        <div class="mb-4">
+          <span class="font-semibold">Name:</span>
+          <span id="confirmName" class="ml-2"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Service:</span>
+          <span id="confirmService" class="ml-2"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Date & Time:</span>
+          <span id="confirmDateTime" class="ml-2"></span>
+        </div>
+        <div class="mb-4">
+          <span class="font-semibold">Phone:</span>
+          <span id="confirmPhone" class="ml-2"></span>
+        </div>
+      </div>
+      
+      <div id="depositReminderSection" class="bg-[#400000] p-6 rounded-lg mb-8">
+        <h3 class="text-xl font-semibold mb-2">Don't forget your deposit!</h3>
+        <p class="mb-4">Please send a $25 deposit to one of the payment methods to secure your appointment:</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="bg-[#250000] p-3 rounded-lg">
+            <h4 class="font-medium">CashApp</h4>
+            <p>$ElegantLashes</p>
+          </div>
+          <div class="bg-[#250000] p-3 rounded-lg">
+            <h4 class="font-medium">Zelle</h4>
+            <p>elegantlashes@email.com</p>
+          </div>
+          <div class="bg-[#250000] p-3 rounded-lg">
+            <h4 class="font-medium">PayPal</h4>
+            <p>elegantlashes@email.com</p>
+          </div>
+        </div>
+      </div>
+      
+      <p class="mb-6">A confirmation has been sent to your email. We'll see you soon!</p>
+      
+      <button id="startOverButton" class="btn-primary text-white py-2 px-6 rounded-full text-lg font-medium hover:shadow-lg transition duration-300">
+        Book Another Appointment
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-8 px-6 bg-[#1a0000] border-t border-[#400000]">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="cursive text-3xl mb-4 text-white">Elegant Brows & Lashes</h2>
+      <p class="mb-6 opacity-80">Enhancing your natural beauty, one appointment at a time</p>
+      
+      <div class="flex justify-center space-x-6 mb-6">
+        <a href="javascript:void(0)" class="text-white hover:text-light-red transition duration-300">
+          <i class="fab fa-instagram text-2xl"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-white hover:text-light-red transition duration-300">
+          <i class="fab fa-facebook text-2xl"></i>
+        </a>
+        <a href="javascript:void(0)" class="text-white hover:text-light-red transition duration-300">
+          <i class="fab fa-tiktok text-2xl"></i>
+        </a>
+      </div>
+      
+      <div class="text-sm opacity-70">
+        <p>&copy; 2025 Elegant Brows & Lashes. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script id="app-script">
+    document.addEventListener('DOMContentLoaded', function() { });
+
+/*************  ✨ Windsurf Command ⭐  *************/
+    /**
+     * Sends an email using the API endpoint at https://api.example.com/send-email
+     *
+     * @param {Object} data - The data to be sent in the request body
+     * @return {Promise<Object>} - A promise that resolves to the server's response
+     * @throws {Error} - If the server returns an error or the request fails
+     * 
+     * 
+     *       const response = await fetch('https://api.example.com/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error('Failed to send email');
+      }
+     */
+/*******  6988e710-4608-4c3c-bebc-ddac83474e37  *******/
+    async function sendEmail(data) {
+      let fullName = data.fullName;
+      let phoneNumber = data.phoneNumber;    
+      let serviceType = data.serviceType;
+      let appointmentDate = data.appointmentDate;
+      let appointmentTime = data.appointmentTime;
+      let specialRequests = data.specialRequests;
+      let paymentLinkClicked = data.paymentLinkClicked;
+      let loadingIndicator = document.getElementById('loadingIndicator');
+      let formContainer = document.getElementById('formContainer');
+      let successMessage = document.getElementById('successMessage');
+                  try {
+              const response = await fetch(
+                'https://magicloops.dev/api/loop/9ea6d66e-ac19-4767-9d3a-5a8d09dc1fa1/run',
+                {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ fullName,phoneNumber, serviceType, appointmentDate, appointmentTime, specialRequests, paymentLinkClicked })
+                }
+              );
+              const json = await response.json();
+
+
+              if (json.success) {
+              } else {
+                // if Loop returns an error
+                formContainer.classList.remove('hidden');
+                alert('Failed to send message. Please try again.');
+              }
+            } catch (err) {
+              console.error('Network error:', err);
+              // Handle network errors
+              alert('Network error. Please try again later.');
+            }
+    }
+
+
+      // Initialize date picker
+      flatpickr("#appointmentDate", {
+        minDate: "today",
+        dateFormat: "Y-m-d",
+        disable: [
+          function(date) {
+            // Disable Sundays and Mondays
+            return date.getDay() === 0 || date.getDay() === 1;
+          }
+        ]
+      });
+      
+      // Initialize time picker
+      flatpickr("#appointmentTime", {
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "h:i K",
+        minTime: "10:00",
+        maxTime: "18:00",
+      });
+      
+      // Format phone number as user types
+      document.getElementById('phoneNumber').addEventListener('input', function(e) {
+        let x = e.target.value.replace(/\D/g, '').match(/(\d{0,3})(\d{0,3})(\d{0,4})/);
+        e.target.value = !x[2] ? x[1] : '(' + x[1] + ') ' + x[2] + (x[3] ? '-' + x[3] : '');
+      });
+      
+      // Track if user has clicked a payment link
+      let paymentLinkClicked = false;
+      
+      document.querySelectorAll('.payment-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+          e.preventDefault();
+          const method = this.getAttribute('data-method');
+          paymentLinkClicked = true;
+          
+          Swal.fire({
+            title: `${method.charAt(0).toUpperCase() + method.slice(1)} Payment`,
+            html: `Please send $25 to: <br><strong>${this.textContent}</strong><br><br>Include your name in the payment memo.`,
+            icon: 'info',
+            confirmButtonText: 'I\'ve Sent Payment',
+            confirmButtonColor: '#660000',
+            background: '#2a0000',
+            color: '#f8e8e8'
+          });
+        });
+      });
+      
+      // Form submission
+      document.getElementById('contact-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Basic validation
+        const fullName = document.getElementById('fullName').value;
+        const serviceType = document.getElementById('serviceType').value;
+        const appointmentDate = document.getElementById('appointmentDate').value;
+        const appointmentTime = document.getElementById('appointmentTime').value;
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        const depositConfirmed = document.getElementById('depositConfirmation').checked;
+        
+        if (!fullName || !serviceType || !appointmentDate || !appointmentTime || !phoneNumber) {
+          Swal.fire({
+            title: 'Missing Information',
+            text: 'Please fill in all required fields',
+            icon: 'error',
+            confirmButtonColor: '#660000',
+            background: '#2a0000',
+            color: '#f8e8e8'
+          });
+          return;
+        }
+        
+        if (!depositConfirmed) {
+          Swal.fire({
+            title: 'Deposit Confirmation Required',
+            text: 'Please confirm that you will send the required $25 deposit',
+            icon: 'warning',
+            confirmButtonColor: '#660000',
+            background: '#2a0000',
+            color: '#f8e8e8'
+          });
+          return;
+        }
+        
+        // Save form data to localStorage in case user refreshes
+        const formData = {
+          fullName,
+          serviceType,
+          appointmentDate,
+          appointmentTime,
+          phoneNumber,
+          specialRequests: document.getElementById('specialRequests').value,
+          paymentLinkClicked
+        };
+        
+        localStorage.setItem('bookingFormData', JSON.stringify(formData));
+        
+        // Show loading state
+        document.getElementById('loadingOverlay').classList.add('active');
+        
+        // Simulate form submission
+        setTimeout(() => {
+          document.getElementById('loadingOverlay').classList.remove('active');
+          
+          // Populate confirmation screen
+          document.getElementById('confirmName').textContent = fullName;
+          document.getElementById('confirmService').textContent = serviceType;
+          document.getElementById('confirmDateTime').textContent = `${appointmentDate} at ${appointmentTime}`;
+          document.getElementById('confirmPhone').textContent = phoneNumber;
+          
+          // Show deposit reminder if payment link wasn't clicked
+          if (!paymentLinkClicked) {
+            document.getElementById('depositReminderSection').classList.remove('hidden');
+          } else {
+            document.getElementById('depositReminderSection').classList.add('hidden');
+          }
+          
+          // Hide booking form and show confirmation
+          document.getElementById('booking').classList.add('hidden');
+          document.getElementById('confirmationSection').classList.remove('hidden');
+
+          sendEmail(formData);
+          
+          // Scroll to confirmation section
+          document.getElementById('confirmationSection').scrollIntoView({
+            behavior: 'smooth'
+          });
+        }, 1500);
+      });
+      
+      // Start over button
+      document.getElementById('startOverButton').addEventListener('click', function() {
+        // Clear form data
+        document.getElementById('bookingForm').reset();
+        localStorage.removeItem('bookingFormData');
+        paymentLinkClicked = false;
+        
+        // Hide confirmation and show booking form
+        document.getElementById('confirmationSection').classList.add('hidden');
+        document.getElementById('booking').classList.remove('hidden');
+        
+        // Scroll to booking form
+        document.getElementById('booking').scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+      
+      // Check if there's saved form data and restore it
+      const savedFormData = localStorage.getItem('bookingFormData');
+      if (savedFormData) {
+        const formData = JSON.parse(savedFormData);
+        document.getElementById('fullName').value = formData.fullName || '';
+        document.getElementById('serviceType').value = formData.serviceType || '';
+        document.getElementById('appointmentDate').value = formData.appointmentDate || '';
+        document.getElementById('appointmentTime').value = formData.appointmentTime || '';
+        document.getElementById('phoneNumber').value = formData.phoneNumber || '';
+        document.getElementById('specialRequests').value = formData.specialRequests || '';
+        paymentLinkClicked = formData.paymentLinkClicked || false;
+      }
+      
+      // Smooth scrolling for navigation links
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+          e.preventDefault();
+          
+          document.querySelector(this.getAttribute('href')).scrollIntoView({
+            behavior: 'smooth'
+          });
+        });
+      });
+   
+  </script>
+</body>
+</html>
